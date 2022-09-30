@@ -1,0 +1,7 @@
+NN_model,training_set_size,percent_succsessful_tests
+model_1,60000,97.75%
+model_1,50000,98.0%
+model_1,10000,97.66%
+model_1,500,97.16%
+model_2,500,96.48%
+model_3,500,97.95%
