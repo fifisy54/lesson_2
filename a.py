@@ -11,7 +11,6 @@ def main():
     print("запускаю обучение нейросети")
 
 
-#
 print(__name__)
 
 if __name__ == "__main__":
