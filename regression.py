@@ -1,4 +1,4 @@
-# import nasdaqdatalink
+import nasdaqdatalink
 import pandas as pd
 import tensorflow as tf
 import numpy as np
@@ -13,8 +13,7 @@ class Model:
     def __init__(self):
         self.model = Sequential()
         self.batch_size = 128
-        # self.df = nasdaqdatalink.get("FRED/GDP", start_date="2010-01-01", end_date="2021-01-01")
-        self.df = pd.read_csv('TSLA.csv')
+        self.df = nasdaqdatalink.get("FRED/GDP", start_date="2010-01-01", end_date="2021-01-01")
         self.data = np.asarray(self.df[['Value']]).flatten()
         self.x_train = None
         self.y_train = None
@@ -35,15 +34,17 @@ class Model:
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(x, y, test_size=0.3)
 
     def fit(self):
-        self.model.add(Dense(64, input_dim=5))
+        self.model.add(Dense(250, input_dim=5))
         self.model.add(BatchNormalization())
-        self.model.add(Dense(16))
+        self.model.add(Dense(100, activation='relu'))
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(25, activation='relu'))
         self.model.add(BatchNormalization())
         self.model.add(Dense(1, activation='relu'))
         self.model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
     def chart(self):
-        history = self.model.fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=10,
+        history = self.model.fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=50,
                                  validation_split=0.2, verbose=1)
         plt.figure()
         plt.plot(history.history['loss'])
@@ -77,3 +78,10 @@ model.preprocess()
 model.fit()
 model.chart()
 model.prediction()
+
+
+# docker + githab
+# файл dockerfile
+# создаю образ с его помощью
+# запускаю контейнер
+# заливаю на git
