@@ -80,6 +80,7 @@ model.chart()
 model.prediction()
 
 
+
 # docker + githab
 # файл dockerfile
 # создаю образ с его помощью
