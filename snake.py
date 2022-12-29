@@ -1,3 +1,4 @@
+import time
 import turtle as t
 from random import randrange
 
@@ -11,6 +12,12 @@ class Snake:
         self.food = t.Turtle()
         self.score = t.Turtle()
         self.head_direction = t.Turtle()
+        self.body_direction = t.Turtle()
+        self.new_segment = t.Turtle()
+        self.segments = []
+        self.cur_score = 0
+        self.highest_score = 0
+        self.delay = 0.1
 
     def game_screen(self):
         self.screen.title('Snake')
@@ -35,6 +42,18 @@ class Snake:
         self.head.goto(0, 0)
         self.head_direction = "stop"
 
+    def body_creation(self):
+        self.new_segment.speed(0)
+        self.new_segment.shape("square")
+        self.new_segment.color("orange")
+        self.new_segment.up()
+        self.segments.append(self.new_segment)
+        self.delay -= 0.001
+        self.cur_score += 10
+        if self.cur_score > self.highest_score:
+            self.highest_score = self.cur_score
+        self.score.clear()
+
     def food_creation(self):
         self.food.shape('circle')
         self.food.color('red')
@@ -49,10 +68,8 @@ class Snake:
         self.score.up()
         self.score.hideturtle()
         self.score.goto(0, 250)
-        cur_score = 0
-        highest_score = 0
 
-        self.score.write('Score : {}    Highest Score : {}'.format(cur_score, highest_score), align='center',
+        self.score.write('Score : {}    Highest Score : {}'.format(self.cur_score, self.highest_score), align='center',
                          font=('Arial', 20, 'bold'))
         t.mainloop()
 
@@ -79,6 +96,13 @@ class Snake:
         self.screen.onkeypress(move_left, "a")
         self.screen.onkeypress(move_right, "d")
 
+    def play(self):
+        while True:
+            self.screen.update()
+            if self.head.xcor() > 290 or self.head.xcor() < -290 or self.head.ycor() > 290 or self.head.ycor() < -290:
+                self.head.goto(0, 0)
+                self.head.direction = "stop"
+
 
 snake = Snake()
 snake.game_screen()
@@ -87,6 +111,7 @@ snake.head_creation()
 snake.food_creation()
 snake.scores()
 snake.move()
+
 
 """
 управление
