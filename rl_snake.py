@@ -1,7 +1,15 @@
 import time
 import turtle as t
 import random
-from random import randrange
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from keras import Sequential
+from collections import deque
+from keras.layers import Dense
+from keras.optimizers import Adam
+
+# ����� -- ������(�����); ����� -- �����; ��������� -- ?; �������� -- ��������; ������� -- +1(������)/-1(������)
 
 
 class Snake:
@@ -165,12 +173,38 @@ snake.move()
 snake.play()
 
 
-"""
-управление
-движение
-удлиннение змейки
-тело и голова разного цвета
-когда съедает еду, +балл к скору
-Проверка на столкновение со стенкой и попытки самоедства
-автоматический перезапуск после
-"""
+class Model:
+
+    def __init__(self, env):
+        self.model = Sequential()
+        self.batch_size = 500
+        self.action_space = env.action_space
+        self.state_space = env.state_space
+        self.layer_sizes = [128, 128, 128]
+        self.learning_rate = 0.00025
+        self.memory = deque(maxlen=2500)
+        self.model = self.fit()
+        # states =
+        # actions =
+        # rewards =
+        # next_states =
+
+    def preprocess(self):
+        ...
+
+    def fit(self):
+        for i in range(len(self.layer_sizes)):
+            if i == 0:
+                self.model.add(Dense(self.layer_sizes[i], input_shape=(self.state_space,), activation='relu'))
+            else:
+                self.model.add(Dense(self.layer_sizes[i], activation='relu'))
+        self.model.add(Dense(self.action_space, activation='softmax'))
+        self.model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
+        return self.model
+
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+
+    def chart(self):
+        # history = self.model.fit(..., epochs=1, verbose=0)
+        ...
