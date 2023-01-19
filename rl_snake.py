@@ -140,6 +140,7 @@ class Snake:
                 else:
                     x = self.segments[index + 1].xcor()
                     y = self.segments[index + 1].ycor()
+
                     self.segments[index].goto(x, y)
 
             # if len(self.segments) > 0:
