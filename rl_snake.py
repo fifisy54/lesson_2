@@ -8,15 +8,39 @@ from keras import Sequential
 from collections import deque
 from keras.layers import Dense
 from keras.optimizers import Adam
+# from rl.agents.dqn import DQNAgent
+# from rl.policy import EpsGreedyQPolicy
+# from rl.memory import SequentialMemory
 
-# агент -- змейка(класс); среда -- экран; состо€ни€ -- ?; действи€ -- движение; награда -- +1(€блоко)/-1(смерть)
+
+class DqnAgent:
+    def __init__(self, state, action, future_state):
+        self.memory = deque(maxlen=100000)
+        self.batch_size = 128
+        self.state = state
+        self.action = action
+        self.future_state = future_state
 
 
-class Snake:
+    def get_state(self):
+        ...
+
+    def Dqn(self):
+        agent = Sequential()
+        agent.add(Dense(64, input_shape=(?), activation='relu'))
+        agent.add(Dense(64, activation='relu'))
+        agent.add(Dense(?, activation='linear'))
+        agent.compile(loss='mse', optimizer=Adam(lr=0.001))
+        return agent
+
+    def remember(self, state, action, reward, future_state, done):
+        self.memory.append((state, action, reward, future_state, done))
+
+
+class Environment:
     def __init__(self):
         self.snake = t.Turtle()
         self.screen = t.Screen()
-        self.border = t.Turtle()
         self.head = t.Turtle()
         self.food = t.Turtle()
         self.score = t.Turtle()
@@ -25,6 +49,7 @@ class Snake:
         self.cur_score = 0
         self.highest_score = 0
         self.delay = 0.1
+        self.reward = 0
 
     def game_screen(self):
         self.screen.title('Snake')
@@ -57,28 +82,28 @@ class Snake:
         self.score.write('Score : {}    Highest Score : {}'.format(self.cur_score, self.highest_score), align='center',
                          font=('Arial', 20, 'bold'))
 
-    def control(self):
-        def move_up():
-            if self.head_direction != 'down':
-                self.head_direction = 'up'
-
-        def move_down():
-            if self.head_direction != 'up':
-                self.head_direction = 'down'
-
-        def move_left():
-            if self.head_direction != 'right':
-                self.head_direction = 'left'
-
-        def move_right():
-            if self.head_direction != 'left':
-                self.head_direction = 'right'
-
-        self.screen.listen()
-        self.screen.onkeypress(move_up, 'w')
-        self.screen.onkeypress(move_down, 's')
-        self.screen.onkeypress(move_left, 'a')
-        self.screen.onkeypress(move_right, 'd')
+    # def control(self):
+    #     def move_up():
+    #         if self.head_direction != 'down':
+    #             self.head_direction = 'up'
+    #
+    #     def move_down():
+    #         if self.head_direction != 'up':
+    #             self.head_direction = 'down'
+    #
+    #     def move_left():
+    #         if self.head_direction != 'right':
+    #             self.head_direction = 'left'
+    #
+    #     def move_right():
+    #         if self.head_direction != 'left':
+    #             self.head_direction = 'right'
+    #
+    #     self.screen.listen()
+    #     self.screen.onkeypress(move_up, 'w')
+    #     self.screen.onkeypress(move_down, 's')
+    #     self.screen.onkeypress(move_left, 'a')
+    #     self.screen.onkeypress(move_right, 'd')
 
     def move(self):
         if self.head_direction == "up":
@@ -107,6 +132,7 @@ class Snake:
                     segment.goto(1000, 1000)
                 self.segments.clear()
                 self.cur_score = 0
+                self.reward -= 1
                 self.score.clear()
                 self.score.write('Score : {}    Highest Score : {}'.format(self.cur_score, self.highest_score),
                                  align='center', font=('Arial', 20, 'bold'))
@@ -124,6 +150,7 @@ class Snake:
                 self.segments.append(self.new_segment)
                 self.delay -= 0.001
                 self.cur_score += 1
+                self.reward += 1
 
                 if self.cur_score > self.highest_score:
                     self.highest_score = self.cur_score
@@ -140,13 +167,8 @@ class Snake:
                 else:
                     x = self.segments[index + 1].xcor()
                     y = self.segments[index + 1].ycor()
-
                     self.segments[index].goto(x, y)
 
-            # if len(self.segments) > 0:
-            #     x = self.head.xcor()
-            #     y = self.head.ycor()
-            #     self.segments[0].goto(x, y)
             self.move()
 
             for segment in self.segments:
@@ -157,55 +179,10 @@ class Snake:
                         i.goto(1000, 1000)
                     segment.clear()
                     self.cur_score = 0
+                    self.reward -= 1
                     self.delay = 0.1
                     self.score.clear()
                     self.score.write('Score : {}    Highest Score : {}'.format(self.cur_score, self.highest_score),
                                      align='center', font=('Arial', 20, 'bold'))
             time.sleep(self.delay)
 
-
-snake = Snake()
-snake.game_screen()
-snake.head_creation()
-snake.food_creation()
-snake.scores()
-snake.control()
-snake.move()
-snake.play()
-
-
-class Model:
-
-    def __init__(self, env):
-        self.model = Sequential()
-        self.batch_size = 500
-        self.action_space = env.action_space
-        self.state_space = env.state_space
-        self.layer_sizes = [128, 128, 128]
-        self.learning_rate = 0.00025
-        self.memory = deque(maxlen=2500)
-        self.model = self.fit()
-        # states =
-        # actions =
-        # rewards =
-        # next_states =
-
-    def preprocess(self):
-        ...
-
-    def fit(self):
-        for i in range(len(self.layer_sizes)):
-            if i == 0:
-                self.model.add(Dense(self.layer_sizes[i], input_shape=(self.state_space,), activation='relu'))
-            else:
-                self.model.add(Dense(self.layer_sizes[i], activation='relu'))
-        self.model.add(Dense(self.action_space, activation='softmax'))
-        self.model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
-        return self.model
-
-    def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done))
-
-    def chart(self):
-        # history = self.model.fit(..., epochs=1, verbose=0)
-        ...
